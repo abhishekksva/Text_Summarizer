@@ -8,7 +8,7 @@ st.set_page_config(page_title="Text Summarizer")
 st.title("Text Summarizer")
 st.subheader("using HuggingFace Transformer")
 
-HF_API_KEY = st.secrets["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"]
+HF_API_KEY = st.secrets["HF_API_KEY"]
 API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 
 def clean_data(text):
