@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 import torch
 import re 
-from fastapi.templating import Jinja2Templates # UI
+from fastapi.templating import Jinja2Templates  # UI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
