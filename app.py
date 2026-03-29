@@ -1,19 +1,15 @@
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
-from transformers import pipeline
+import streamlit as st
+import requests
 import re
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+import os
 
-app = FastAPI()
+st.set_page_config(page_title="Text Summarizer")
 
-# Lightweight summarization pipeline
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-6-6")
+st.title("Text Summarizer")
+st.subheader("using HuggingFace Transformer")
 
-templates = Jinja2Templates(directory="templates")
-
-class DialogueInput(BaseModel):
-    dialogue: str
+HF_API_KEY = st.secrets["HF_API_KEY"]
+API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 
 def clean_data(text):
     text = re.sub(r"\r\n", " ", text)
@@ -21,13 +17,22 @@ def clean_data(text):
     text = re.sub(r"<.*?>", " ", text)
     return text.strip()
 
-@app.post("/summarize/")
-async def summarize(dialogue_input: DialogueInput):
-    text = clean_data(dialogue_input.dialogue)
-    result = summarizer(text, max_length=130, min_length=30, do_sample=False)
-    return {"summary": result[0]["summary_text"]}
+def summarize(text):
+    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+    response = requests.post(API_URL, headers=headers, json={"inputs": text})
+    result = response.json()
+    if isinstance(result, list):
+        return result[0]["summary_text"]
+    return "Error: " + str(result)
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+text_input = st.text_area("Write or Paste your content below:", height=200)
 
+if st.button("Summarize"):
+    if text_input.strip():
+        with st.spinner("Processing..."):
+            cleaned = clean_data(text_input)
+            summary = summarize(cleaned)
+            st.success("Content Summary")
+            st.write(summary)
+    else:
+        st.warning("Please enter some text!")
