@@ -1,4 +1,3 @@
-cat > app.py << 'EOF'
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from transformers import pipeline
