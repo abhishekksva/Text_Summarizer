@@ -2,6 +2,5 @@ fastapi
 uvicorn
 transformers
 torch
-sentencepiece
-jinja2
-python-multipart
+streamlit
+requests
